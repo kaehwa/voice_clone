@@ -21,7 +21,7 @@ CONSENT_EMAIL = os.getenv("CONSENT_EMAIL", "jj7141@gmail.com")
 CLONE_NAME = os.getenv("CLONE_NAME", "my-ko-clone")
 CLONE_LOCALE = os.getenv("CLONE_LOCALE", "ko-KR")
 CLONE_GENDER = os.getenv("CLONE_GENDER", "notSpecified")
-LOCAL_HOST = os.getenv("LOCALHOST", "http://localhost:8000")
+LOCAL_HOST = os.getenv("LOCALHOST", "http://localhost:9000")
 def get_service() -> SpeechifyService:
     token = resolve_api_key()
     return SpeechifyService(token=token)
