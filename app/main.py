@@ -2,7 +2,9 @@
 from dotenv import load_dotenv
 load_dotenv()
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException, Request
+from fastapi.exceptions import RequestValidationError
+from fastapi.responses import JSONResponse
 from fastapi.middleware.cors import CORSMiddleware
 from starlette.staticfiles import StaticFiles
 
@@ -27,6 +29,25 @@ def create_app() -> FastAPI:
 
     # 라우터 등록
     app.include_router(tts_router)
+
+    # Custom handler for validation errors -> 400 Bad Request
+    from fastapi.exceptions import RequestValidationError
+    from fastapi.responses import JSONResponse
+    from fastapi import Request
+
+    @app.exception_handler(RequestValidationError)
+    async def validation_exception_handler(request: Request, exc: RequestValidationError):
+        # Aggregate validation error messages
+        msgs = [err.get("msg") for err in exc.errors()]
+        return JSONResponse(status_code=400, content={"message": "\n".join(msgs)})
+
+    # Override HTTPException for status 400 to use Message schema
+    @app.exception_handler(HTTPException)
+    async def http_exception_handler(request: Request, exc: HTTPException):
+        if exc.status_code == 400:
+            return JSONResponse(status_code=400, content={"message": exc.detail or "Bad Request"})
+        # fallback to default handler
+        raise exc
 
     @app.get("/", tags=["root"])
     def root():
