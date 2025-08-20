@@ -96,5 +96,5 @@ class SpeechifyService:
         # 파일명: voice_id 앞부분 + 해시 느낌(간단)
         safe_vid = voice_id[:12].replace("/", "_")
         filename = f"{safe_vid}_{abs(hash(text_or_ssml)) % (10**8)}.{audio_format}"
-        out_path = Path("outputs") / filename
+        out_path = Path("voice_output") / filename
         return write_b64_audio_to_file(audio_b64, out_path)

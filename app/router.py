@@ -15,14 +15,13 @@ from .model import SpeechifyService, ApiError
 from .utils import resolve_api_key
 
 router = APIRouter(prefix="/tts", tags=["TTS"])
-
 # Default clone settings (user need only provide sample audio and text)
-CONSENT_NAME = os.getenv("CONSENT_NAME", "Default Name")
-CONSENT_EMAIL = os.getenv("CONSENT_EMAIL", "default@example.com")
+CONSENT_NAME = os.getenv("CONSENT_NAME", "전정웅")
+CONSENT_EMAIL = os.getenv("CONSENT_EMAIL", "jj7141@gmail.com")
 CLONE_NAME = os.getenv("CLONE_NAME", "my-ko-clone")
 CLONE_LOCALE = os.getenv("CLONE_LOCALE", "ko-KR")
 CLONE_GENDER = os.getenv("CLONE_GENDER", "notSpecified")
-
+LOCAL_HOST = os.getenv("LOCALHOST", "http://localhost:8000")
 def get_service() -> SpeechifyService:
     token = resolve_api_key()
     return SpeechifyService(token=token)
@@ -98,7 +97,7 @@ async def clone_voice(
     try:
         # 업로드 파일을 임시 저장
         content = await sample.read()
-        tmp_path = Path("outputs") / f"_tmp_{sample.filename}"
+        tmp_path = Path("voice_output") / f"_tmp_{sample.filename}"
         tmp_path.parent.mkdir(parents=True, exist_ok=True)
         tmp_path.write_bytes(content)
 
@@ -167,7 +166,9 @@ async def clone_and_synthesize(
             tmp_path.unlink(missing_ok=True)
         except Exception:
             pass
-        return {"file_url": f"/static/{out_path.name}", "filename": out_path.name}
+        # Prepare response URL
+        filename = out_path.name
+        return {"file_url": f"{LOCAL_HOST}/{filename}", "filename": filename}
     except ApiError as e:
         raise HTTPException(status_code=e.status_code or 502, detail=e.body or "Speechify API error")
     except Exception as e:
@@ -189,9 +190,10 @@ def synthesize(req: SynthesizeRequest, svc: SpeechifyService = Depends(get_servi
             break_ms=req.break_ms,
         )
         # /static 에 마운트된 정적 파일 URL 반환
+        filename = out_path.name
         return {
-            "file_url": f"/static/{out_path.name}",
-            "filename": out_path.name,
+            "file_url": f"{LOCAL_HOST}/{filename}",
+            "filename": filename,
         }
     except ApiError as e:
         raise HTTPException(status_code=e.status_code or 502, detail=e.body or "Speechify API error")
