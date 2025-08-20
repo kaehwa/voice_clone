@@ -1,3 +1,4 @@
 .env
 speechify_voice.py
-__pycache__/
+**/__blob_storage__/
+**/__pycache__/

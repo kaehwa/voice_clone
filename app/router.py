@@ -60,12 +60,6 @@ def list_voices(
 ):
 
     try:
-        # consent_name, consent_email = 상수로 선언하고 
-        #1. voice file : str => .wav 저장 -> filepath
-        #2. text(message) : str => 변수에 저장
-        #3. 음성처리 함수에 전달  [리턴] = function(filepath, message, name, email)
-        #4. voice_output -> byte형태로 변환
-        #5. 지은이가 원하는 포맷으로 reponse 보냄
         raw = svc.list_voices_raw()
         filtered = svc.filter_voices(raw, locale, name_like, include_personal)
         voices: List[VoiceOut] = [
