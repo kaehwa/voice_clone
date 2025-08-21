@@ -79,8 +79,10 @@ class SpeechifyService:
         pitch: Optional[str] = None,
         break_ms: Optional[int] = None,
     ) -> Path:
+        # 텍스트 또는 SSML 래핑
         text_or_ssml = wrap_emotion_ssml(text, emotion, rate, pitch, break_ms)
 
+        # API 호출
         res = self.client.tts.audio.speech(
             input=text_or_ssml,
             voice_id=voice_id,
@@ -92,9 +94,9 @@ class SpeechifyService:
         if not audio_b64:
             raise RuntimeError("audio_data가 응답에 없습니다.")
 
-        ensure_output_dir()
-        # 파일명: voice_id 앞부분 + 해시 느낌(간단)
+        # 출력 디렉토리 생성 및 파일 저장
+        out_dir = ensure_output_dir()
         safe_vid = voice_id[:12].replace("/", "_")
         filename = f"{safe_vid}_{abs(hash(text_or_ssml)) % (10**8)}.{audio_format}"
-        out_path = Path("voice_output") / filename
+        out_path = out_dir / filename
         return write_b64_audio_to_file(audio_b64, out_path)
