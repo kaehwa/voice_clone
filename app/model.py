@@ -96,7 +96,7 @@ class SpeechifyService:
 
         # 출력 디렉토리 생성 및 파일 저장
         out_dir = ensure_output_dir()
-        safe_vid = voice_id[:12].replace("/", "_")
-        filename = f"{safe_vid}_{abs(hash(text_or_ssml)) % (10**8)}.{audio_format}"
+        # 고정된 파일명으로 설정
+        filename = "voice_final.mp3"
         out_path = out_dir / filename
         return write_b64_audio_to_file(audio_b64, out_path)
